@@ -2,6 +2,9 @@
 #include "HalUart.h"
 #include "stdio.h"
 
+#define PRINTF_BUF_LEN 1024
+static char printf_buf[PRINTF_BUF_LEN];
+
 uint32_t putstr(const char* s){
 	uint32_t c = 0;
 	while(*s){
@@ -53,7 +56,7 @@ uint32_t vsprintf(char* buf, const char* format, va_list arg)
 				break;
 			case 'u':
 				uint = (uint32_t)va_arg(arg, uint32_t);
-				c += utoa(&buf[c], uint utoa_dec);
+				c += utoa(&buf[c], uint, utoa_dec);
 				break;
 			case 'x':
 				hex = (uint32_t)va_arg(arg, uint32_t);
@@ -78,28 +81,31 @@ uint32_t vsprintf(char* buf, const char* format, va_list arg)
 
 uint32_t utoa(char* buf, uint32_t val, utoa_t base)
 {
-	uint32_t c = 0;
-	int32_t  idx = 0;
-	char 	 tmp[11];
+    const char asciibase = 'a';
 
-	do{
-		uint32_t t = val % (uint32_t)base;
-		if (t >= 10)
-		{
-			t += 'A' - '0' - 10;
-		}
-		tmp[idx] = (t + '0');
-		val /= base;
-		idx++;
-	}while(val);
+    uint32_t c = 0;
+    int32_t idx = 0;
+    char     tmp[11];   // It is enough for 32 bit int
 
-	//reverse
-	idx--;
-	while (idx >= 0)
-	{
-		buf[c++] = tmp[idx];
-		idx--;
-	}
+    do {
+        uint32_t t = val % (uint32_t)base;
+        if (t >= 10)
+        {
+            t += asciibase - '0' - 10;
+        }
+        tmp[idx] = (t + '0');
+        val /= base;
+        idx++;
+    } while(val);
 
-	return c;
+    // reverse
+    idx--;
+    while (idx >= 0)
+    {
+        buf[c++] = tmp[idx];
+        idx--;
+    }
+
+    return c;
 }
+
