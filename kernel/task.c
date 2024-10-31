@@ -22,5 +22,14 @@ void Kernel_task_init(void){
 }
 
 uint32_t Kernel_task_create(KernelTaskFunc_t startFunc){
-	return NOT_ENOUGH_TASK_NUM;
+	KernelTcb_t* new_tcb = &sTask_list[sAllocated_tcb_index++];
+
+	if (sAllocated_tcb_index > MAX_TASK_NUM){
+		return NOT_ENOUGH_TASK_NUM;
+	}
+
+	KernelTaskContext_t* ctx = (KernelTaskContext_t*)new_tcb->sp;
+	ctx->pc = (uint32_t)startFunc;
+
+	return (sAllocated_tcb_index - 1);
 }
