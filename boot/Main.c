@@ -7,9 +7,12 @@
 
 #include "stdio.h"
 #include "stdlib.h"
+
 #include "task.h"
 
 static void Hw_init(void);
+static void Kernel_init(void);
+
 static void Printf_test(void);
 static void Timer_test(void);
 
@@ -31,6 +34,9 @@ void main(void)
 
 	Printf_test();
 	Timer_test();	
+
+	Kernel_init();
+
 	while(true);
 }
 
