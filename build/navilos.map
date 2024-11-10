@@ -24,12 +24,15 @@ LOAD build/Uart.o
 LOAD build/armcpu.o
 LOAD build/stdio.o
 LOAD build/stdlib.o
+LOAD build/event.o
 LOAD build/Kernel.o
+LOAD build/msg.o
+LOAD build/synch.o
 LOAD build/task.o
 LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
                 0x00000000                        . = 0x0
 
-.text           0x00000000     0x1550
+.text           0x00000000     0x22f0
  *(vector_start)
  *(.text .rodata)
  .text          0x00000000       0xd4 build/Entry.os
@@ -38,116 +41,152 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
  .text          0x000000d4       0x24 build/Handler.o
                 0x000000d4                Irq_Handler
                 0x000000f0                Fiq_Handler
- .text          0x000000f8      0x2b0 build/Main.o
+ .text          0x000000f8      0x4dc build/Main.o
                 0x000000f8                main
-                0x000002f4                User_task0
-                0x00000330                User_task1
-                0x0000036c                User_task2
- .rodata        0x000003a8      0x181 build/Main.o
- *fill*         0x00000529        0x3 
- .text          0x0000052c      0x2f8 build/Interrupt.o
-                0x0000052c                Hal_interrupt_init
-                0x000005c8                Hal_interrupt_enable
-                0x00000694                Hal_interrupt_disable
-                0x00000768                Hal_interrupt_register_handler
-                0x000007a0                Hal_interrupt_run_handler
- .text          0x00000824        0x0 build/Regs.o
- .text          0x00000824      0x210 build/Timer.o
-                0x00000824                Hal_timer_init
-                0x000009c8                Hal_timer_get_1ms_counter
- .text          0x00000a34      0x184 build/Uart.o
-                0x00000a34                Hal_uart_init
-                0x00000ad4                Hal_uart_put_char
-                0x00000b30                Hal_uart_get_char
- .text          0x00000bb8       0xb0 build/armcpu.o
-                0x00000bb8                enable_irq
-                0x00000be4                disable_irq
-                0x00000c10                enable_fiq
-                0x00000c3c                disable_fiq
- .text          0x00000c68      0x454 build/stdio.o
-                0x00000c68                putstr
-                0x00000cc8                debug_printf
-                0x00000d18                vsprintf
-                0x00000f98                utoa
- .rodata        0x000010bc        0x7 build/stdio.o
- *fill*         0x000010c3        0x1 
- .text          0x000010c4       0x4c build/stdlib.o
-                0x000010c4                delay
- .text          0x00001110       0x28 build/Kernel.o
-                0x00001110                Kernel_start
-                0x00001124                Kernel_yield
- .text          0x00001138      0x300 build/task.o
-                0x00001138                Kernel_task_init
-                0x00001244                Kernel_task_start
-                0x00001280                Kernel_task_create
-                0x00001394                Kernel_task_scheduler
-                0x000013e4                Kernel_task_context_switching
- .text          0x00001438      0x114 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
-                0x00001438                __udivsi3
-                0x00001438                __aeabi_uidiv
-                0x0000152c                __aeabi_uidivmod
- .text          0x0000154c        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
-                0x0000154c                __aeabi_ldiv0
-                0x0000154c                __aeabi_idiv0
+                0x00000340                User_task0
+                0x00000458                User_task1
+                0x00000520                User_task2
+ .rodata        0x000005d4      0x197 build/Main.o
+ *fill*         0x0000076b        0x1 
+ .text          0x0000076c      0x2f8 build/Interrupt.o
+                0x0000076c                Hal_interrupt_init
+                0x00000808                Hal_interrupt_enable
+                0x000008d4                Hal_interrupt_disable
+                0x000009a8                Hal_interrupt_register_handler
+                0x000009e0                Hal_interrupt_run_handler
+ .text          0x00000a64        0x0 build/Regs.o
+ .text          0x00000a64      0x210 build/Timer.o
+                0x00000a64                Hal_timer_init
+                0x00000c08                Hal_timer_get_1ms_counter
+ .text          0x00000c74      0x1cc build/Uart.o
+                0x00000c74                Hal_uart_init
+                0x00000d14                Hal_uart_put_char
+                0x00000d70                Hal_uart_get_char
+ .text          0x00000e40       0xb0 build/armcpu.o
+                0x00000e40                enable_irq
+                0x00000e6c                disable_irq
+                0x00000e98                enable_fiq
+                0x00000ec4                disable_fiq
+ .text          0x00000ef0      0x454 build/stdio.o
+                0x00000ef0                putstr
+                0x00000f50                debug_printf
+                0x00000fa0                vsprintf
+                0x00001220                utoa
+ .rodata        0x00001344        0x7 build/stdio.o
+ *fill*         0x0000134b        0x1 
+ .text          0x0000134c       0xa8 build/stdlib.o
+                0x0000134c                delay
+                0x00001398                memclr
+ .text          0x000013f4       0xf8 build/event.o
+                0x000013f4                Kernel_event_flag_init
+                0x0000141c                Kernel_event_flag_set
+                0x0000145c                Kernel_event_flag_clear
+                0x000014a0                Kernel_event_flag_check
+ .text          0x000014ec      0x388 build/Kernel.o
+                0x000014ec                Kernel_start
+                0x00001500                Kernel_yield
+                0x00001514                Kernel_send_events
+                0x0000159c                Kernel_wait_events
+                0x00001638                Kernel_send_msg
+                0x00001710                Kernel_recv_msg
+                0x000017a4                Kernel_lock_sem
+                0x000017d8                Kernel_unlock_sem
+                0x000017ec                Kernel_lock_mutex
+                0x00001834                Kernel_unlock_mutex
+ .text          0x00001874      0x41c build/msg.o
+                0x00001874                Kernel_msgQ_init
+                0x00001920                Kernel_msgQ_is_empty
+                0x000019a8                Kernel_msgQ_is_full
+                0x00001a38                Kernel_msgQ_enqueue
+                0x00001b70                Kernel_msgQ_dequeue
+ .text          0x00001c90      0x224 build/synch.o
+                0x00001c90                Kernel_sem_init
+                0x00001d08                Kernel_sem_test
+                0x00001d5c                Kernel_sem_release
+                0x00001dc8                Kernel_mutex_init
+                0x00001e00                Kernel_mutex_lock
+                0x00001e60                Kernel_mutex_unlock
+ .text          0x00001eb4      0x324 build/task.o
+                0x00001eb4                Kernel_task_init
+                0x00001fc0                Kernel_task_start
+                0x00001ffc                Kernel_task_create
+                0x00002090                Kernel_task_get_current_task_id
+                0x000020b4                Kernel_task_scheduler
+                0x00002104                Kernel_task_context_switching
+ .text          0x000021d8      0x114 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+                0x000021d8                __udivsi3
+                0x000021d8                __aeabi_uidiv
+                0x000022cc                __aeabi_uidivmod
+ .text          0x000022ec        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+                0x000022ec                __aeabi_ldiv0
+                0x000022ec                __aeabi_idiv0
 
-.glue_7         0x00001550        0x0
- .glue_7        0x00001550        0x0 linker stubs
+.glue_7         0x000022f0        0x0
+ .glue_7        0x000022f0        0x0 linker stubs
 
-.glue_7t        0x00001550        0x0
- .glue_7t       0x00001550        0x0 linker stubs
+.glue_7t        0x000022f0        0x0
+ .glue_7t       0x000022f0        0x0 linker stubs
 
-.vfp11_veneer   0x00001550        0x0
- .vfp11_veneer  0x00001550        0x0 linker stubs
+.vfp11_veneer   0x000022f0        0x0
+ .vfp11_veneer  0x000022f0        0x0 linker stubs
 
-.v4_bx          0x00001550        0x0
- .v4_bx         0x00001550        0x0 linker stubs
+.v4_bx          0x000022f0        0x0
+ .v4_bx         0x000022f0        0x0 linker stubs
 
-.iplt           0x00001550        0x0
- .iplt          0x00001550        0x0 build/Entry.os
+.iplt           0x000022f0        0x0
+ .iplt          0x000022f0        0x0 build/Entry.os
 
-.rel.dyn        0x00001550        0x0
- .rel.iplt      0x00001550        0x0 build/Entry.os
+.rel.dyn        0x000022f0        0x0
+ .rel.iplt      0x000022f0        0x0 build/Entry.os
 
-.data           0x00001550       0x10
+.data           0x000022f0       0x10
  *(.data)
- .data          0x00001550        0x0 build/Entry.os
- .data          0x00001550        0x0 build/Handler.o
- .data          0x00001550        0x0 build/Main.o
- .data          0x00001550        0x0 build/Interrupt.o
- .data          0x00001550       0x10 build/Regs.o
-                0x00001550                Uart
-                0x00001554                GicCpu
-                0x00001558                GicDist
-                0x0000155c                Timer
- .data          0x00001560        0x0 build/Timer.o
- .data          0x00001560        0x0 build/Uart.o
- .data          0x00001560        0x0 build/armcpu.o
- .data          0x00001560        0x0 build/stdio.o
- .data          0x00001560        0x0 build/stdlib.o
- .data          0x00001560        0x0 build/Kernel.o
- .data          0x00001560        0x0 build/task.o
- .data          0x00001560        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
- .data          0x00001560        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+ .data          0x000022f0        0x0 build/Entry.os
+ .data          0x000022f0        0x0 build/Handler.o
+ .data          0x000022f0        0x0 build/Main.o
+ .data          0x000022f0        0x0 build/Interrupt.o
+ .data          0x000022f0       0x10 build/Regs.o
+                0x000022f0                Uart
+                0x000022f4                GicCpu
+                0x000022f8                GicDist
+                0x000022fc                Timer
+ .data          0x00002300        0x0 build/Timer.o
+ .data          0x00002300        0x0 build/Uart.o
+ .data          0x00002300        0x0 build/armcpu.o
+ .data          0x00002300        0x0 build/stdio.o
+ .data          0x00002300        0x0 build/stdlib.o
+ .data          0x00002300        0x0 build/event.o
+ .data          0x00002300        0x0 build/Kernel.o
+ .data          0x00002300        0x0 build/msg.o
+ .data          0x00002300        0x0 build/synch.o
+ .data          0x00002300        0x0 build/task.o
+ .data          0x00002300        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .data          0x00002300        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
-.igot.plt       0x00001560        0x0
- .igot.plt      0x00001560        0x0 build/Entry.os
+.igot.plt       0x00002300        0x0
+ .igot.plt      0x00002300        0x0 build/Entry.os
 
-.bss            0x00001560      0xa10
+.bss            0x00002300     0x1040
  *(.bss)
- .bss           0x00001560        0x0 build/Entry.os
- .bss           0x00001560        0x0 build/Handler.o
- .bss           0x00001560        0x0 build/Main.o
- .bss           0x00001560      0x3fc build/Interrupt.o
- .bss           0x0000195c        0x0 build/Regs.o
- .bss           0x0000195c        0x4 build/Timer.o
- .bss           0x00001960        0x0 build/Uart.o
- .bss           0x00001960        0x0 build/armcpu.o
- .bss           0x00001960      0x400 build/stdio.o
- .bss           0x00001d60        0x0 build/stdlib.o
- .bss           0x00001d60        0x0 build/Kernel.o
- .bss           0x00001d60      0x210 build/task.o
- .bss           0x00001f70        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
- .bss           0x00001f70        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+ .bss           0x00002300        0x0 build/Entry.os
+ .bss           0x00002300        0x0 build/Handler.o
+ .bss           0x00002300        0x4 build/Main.o
+ .bss           0x00002304      0x3fc build/Interrupt.o
+ .bss           0x00002700        0x0 build/Regs.o
+ .bss           0x00002700        0x4 build/Timer.o
+ .bss           0x00002704        0x0 build/Uart.o
+ .bss           0x00002704        0x0 build/armcpu.o
+ .bss           0x00002704      0x400 build/stdio.o
+ .bss           0x00002b04        0x0 build/stdlib.o
+ .bss           0x00002b04        0x4 build/event.o
+ .bss           0x00002b08        0x0 build/Kernel.o
+ .bss           0x00002b08      0x618 build/msg.o
+                0x00002b08                sMsgQ
+ .bss           0x00003120       0x10 build/synch.o
+                0x00003128                sMutex
+ .bss           0x00003130      0x210 build/task.o
+ .bss           0x00003340        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .bss           0x00003340        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 OUTPUT(build/navilos.axf elf32-littlearm)
 LOAD linker stubs
 
@@ -174,13 +213,19 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000195       0x2f build/stdlib.o
  .ARM.attributes
-                0x000001c4       0x2f build/Kernel.o
+                0x000001c4       0x2f build/event.o
  .ARM.attributes
-                0x000001f3       0x2f build/task.o
+                0x000001f3       0x2f build/Kernel.o
  .ARM.attributes
-                0x00000222       0x1c /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+                0x00000222       0x2f build/msg.o
  .ARM.attributes
-                0x0000023e       0x1c /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+                0x00000251       0x2f build/synch.o
+ .ARM.attributes
+                0x00000280       0x2f build/task.o
+ .ARM.attributes
+                0x000002af       0x1c /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .ARM.attributes
+                0x000002cb       0x1c /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
 .comment        0x00000000       0x26
  .comment       0x00000000       0x26 build/Handler.o
@@ -193,24 +238,30 @@ LOAD linker stubs
  .comment       0x00000026       0x27 build/armcpu.o
  .comment       0x00000026       0x27 build/stdio.o
  .comment       0x00000026       0x27 build/stdlib.o
+ .comment       0x00000026       0x27 build/event.o
  .comment       0x00000026       0x27 build/Kernel.o
+ .comment       0x00000026       0x27 build/msg.o
+ .comment       0x00000026       0x27 build/synch.o
  .comment       0x00000026       0x27 build/task.o
 
-.debug_line     0x00000000      0xa6d
+.debug_line     0x00000000      0xf5c
  .debug_line    0x00000000       0x7a build/Entry.os
  .debug_line    0x0000007a       0x5e build/Handler.o
- .debug_line    0x000000d8      0x169 build/Main.o
- .debug_line    0x00000241      0x12c build/Interrupt.o
- .debug_line    0x0000036d       0x68 build/Regs.o
- .debug_line    0x000003d5       0xf2 build/Timer.o
- .debug_line    0x000004c7       0xf5 build/Uart.o
- .debug_line    0x000005bc       0x67 build/armcpu.o
- .debug_line    0x00000623      0x192 build/stdio.o
- .debug_line    0x000007b5       0x80 build/stdlib.o
- .debug_line    0x00000835       0x58 build/Kernel.o
- .debug_line    0x0000088d      0x12f build/task.o
- .debug_line    0x000009bc       0x67 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
- .debug_line    0x00000a23       0x4a /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+ .debug_line    0x000000d8      0x1f7 build/Main.o
+ .debug_line    0x000002cf      0x12c build/Interrupt.o
+ .debug_line    0x000003fb       0x68 build/Regs.o
+ .debug_line    0x00000463       0xf2 build/Timer.o
+ .debug_line    0x00000555      0x139 build/Uart.o
+ .debug_line    0x0000068e       0x67 build/armcpu.o
+ .debug_line    0x000006f5      0x192 build/stdio.o
+ .debug_line    0x00000887       0x98 build/stdlib.o
+ .debug_line    0x0000091f       0x8d build/event.o
+ .debug_line    0x000009ac      0x1d2 build/Kernel.o
+ .debug_line    0x00000b7e      0x12e build/msg.o
+ .debug_line    0x00000cac       0xd7 build/synch.o
+ .debug_line    0x00000d83      0x128 build/task.o
+ .debug_line    0x00000eab       0x67 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .debug_line    0x00000f12       0x4a /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
 .debug_line_str
                 0x00000000       0xa9
@@ -222,39 +273,45 @@ LOAD linker stubs
  .debug_line_str
                 0x000000a9       0x7e /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
-.debug_info     0x00000000     0x2bf7
+.debug_info     0x00000000     0x3aff
  .debug_info    0x00000000       0x25 build/Entry.os
  .debug_info    0x00000025       0x8b build/Handler.o
- .debug_info    0x000000b0      0x258 build/Main.o
- .debug_info    0x00000308      0x5b3 build/Interrupt.o
- .debug_info    0x000008bb      0xfc9 build/Regs.o
- .debug_info    0x00001884      0x29f build/Timer.o
- .debug_info    0x00001b23      0x9a1 build/Uart.o
- .debug_info    0x000024c4       0x67 build/armcpu.o
- .debug_info    0x0000252b      0x2bd build/stdio.o
- .debug_info    0x000027e8       0xa7 build/stdlib.o
- .debug_info    0x0000288f       0x8d build/Kernel.o
- .debug_info    0x0000291c      0x261 build/task.o
- .debug_info    0x00002b7d       0x3e /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
- .debug_info    0x00002bbb       0x3c /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+ .debug_info    0x000000b0      0x560 build/Main.o
+ .debug_info    0x00000610      0x5b3 build/Interrupt.o
+ .debug_info    0x00000bc3      0xfc9 build/Regs.o
+ .debug_info    0x00001b8c      0x29f build/Timer.o
+ .debug_info    0x00001e2b      0xb24 build/Uart.o
+ .debug_info    0x0000294f       0x67 build/armcpu.o
+ .debug_info    0x000029b6      0x2bd build/stdio.o
+ .debug_info    0x00002c73       0xf9 build/stdlib.o
+ .debug_info    0x00002d6c      0x222 build/event.o
+ .debug_info    0x00002f8e      0x4b8 build/Kernel.o
+ .debug_info    0x00003446      0x240 build/msg.o
+ .debug_info    0x00003686      0x188 build/synch.o
+ .debug_info    0x0000380e      0x277 build/task.o
+ .debug_info    0x00003a85       0x3e /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .debug_info    0x00003ac3       0x3c /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
-.debug_abbrev   0x00000000      0xbeb
+.debug_abbrev   0x00000000     0x117a
  .debug_abbrev  0x00000000       0x14 build/Entry.os
  .debug_abbrev  0x00000014       0x6f build/Handler.o
- .debug_abbrev  0x00000083      0x141 build/Main.o
- .debug_abbrev  0x000001c4      0x1be build/Interrupt.o
- .debug_abbrev  0x00000382      0x121 build/Regs.o
- .debug_abbrev  0x000004a3      0x160 build/Timer.o
- .debug_abbrev  0x00000603      0x1c8 build/Uart.o
- .debug_abbrev  0x000007cb       0x2f build/armcpu.o
- .debug_abbrev  0x000007fa      0x152 build/stdio.o
- .debug_abbrev  0x0000094c       0x89 build/stdlib.o
- .debug_abbrev  0x000009d5       0x59 build/Kernel.o
- .debug_abbrev  0x00000a2e      0x16f build/task.o
- .debug_abbrev  0x00000b9d       0x28 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
- .debug_abbrev  0x00000bc5       0x26 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+ .debug_abbrev  0x00000083      0x1b3 build/Main.o
+ .debug_abbrev  0x00000236      0x1be build/Interrupt.o
+ .debug_abbrev  0x000003f4      0x121 build/Regs.o
+ .debug_abbrev  0x00000515      0x160 build/Timer.o
+ .debug_abbrev  0x00000675      0x216 build/Uart.o
+ .debug_abbrev  0x0000088b       0x2f build/armcpu.o
+ .debug_abbrev  0x000008ba      0x152 build/stdio.o
+ .debug_abbrev  0x00000a0c       0xd8 build/stdlib.o
+ .debug_abbrev  0x00000ae4       0xdf build/event.o
+ .debug_abbrev  0x00000bc3      0x173 build/Kernel.o
+ .debug_abbrev  0x00000d36      0x159 build/msg.o
+ .debug_abbrev  0x00000e8f      0x113 build/synch.o
+ .debug_abbrev  0x00000fa2      0x18a build/task.o
+ .debug_abbrev  0x0000112c       0x28 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x00001154       0x26 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
-.debug_aranges  0x00000000      0x1b8
+.debug_aranges  0x00000000      0x218
  .debug_aranges
                 0x00000000       0x20 build/Entry.os
  .debug_aranges
@@ -276,40 +333,57 @@ LOAD linker stubs
  .debug_aranges
                 0x00000118       0x20 build/stdlib.o
  .debug_aranges
-                0x00000138       0x20 build/Kernel.o
+                0x00000138       0x20 build/event.o
  .debug_aranges
-                0x00000158       0x20 build/task.o
+                0x00000158       0x20 build/Kernel.o
  .debug_aranges
-                0x00000178       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+                0x00000178       0x20 build/msg.o
  .debug_aranges
-                0x00000198       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+                0x00000198       0x20 build/synch.o
+ .debug_aranges
+                0x000001b8       0x20 build/task.o
+ .debug_aranges
+                0x000001d8       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x000001f8       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
-.debug_str      0x00000000      0xbc5
- .debug_str     0x00000000      0xbc5 build/Entry.os
+.debug_str      0x00000000     0x12a0
+ .debug_str     0x00000000     0x12a0 build/Entry.os
                                  0x37 (size before relaxing)
- .debug_str     0x00000bc5      0x134 build/Handler.o
- .debug_str     0x00000bc5      0x249 build/Main.o
- .debug_str     0x00000bc5      0x3c9 build/Interrupt.o
- .debug_str     0x00000bc5      0x6af build/Regs.o
- .debug_str     0x00000bc5      0x29f build/Timer.o
- .debug_str     0x00000bc5      0x492 build/Uart.o
- .debug_str     0x00000bc5       0xc5 build/armcpu.o
- .debug_str     0x00000bc5      0x1ac build/stdio.o
- .debug_str     0x00000bc5      0x12e build/stdlib.o
- .debug_str     0x00000bc5      0x145 build/Kernel.o
- .debug_str     0x00000bc5      0x25d build/task.o
- .debug_str     0x00000bc5       0xa5 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
- .debug_str     0x00000bc5       0xa6 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
+ .debug_str     0x000012a0      0x134 build/Handler.o
+ .debug_str     0x000012a0      0x73b build/Main.o
+ .debug_str     0x000012a0      0x3c9 build/Interrupt.o
+ .debug_str     0x000012a0      0x6af build/Regs.o
+ .debug_str     0x000012a0      0x29f build/Timer.o
+ .debug_str     0x000012a0      0x881 build/Uart.o
+ .debug_str     0x000012a0       0xc5 build/armcpu.o
+ .debug_str     0x000012a0      0x1ac build/stdio.o
+ .debug_str     0x000012a0      0x143 build/stdlib.o
+ .debug_str     0x000012a0      0x508 build/event.o
+ .debug_str     0x000012a0      0x6e8 build/Kernel.o
+ .debug_str     0x000012a0      0x207 build/msg.o
+ .debug_str     0x000012a0      0x1b1 build/synch.o
+ .debug_str     0x000012a0      0x27d build/task.o
+ .debug_str     0x000012a0       0xa5 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .debug_str     0x000012a0       0xa6 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_dvmd_tls.o)
 
-.debug_frame    0x00000000      0x59c
+.debug_frame    0x00000000      0x908
  .debug_frame   0x00000000       0x50 build/Handler.o
- .debug_frame   0x00000050       0xf8 build/Main.o
- .debug_frame   0x00000148       0xb0 build/Interrupt.o
- .debug_frame   0x000001f8       0x70 build/Timer.o
- .debug_frame   0x00000268       0x8c build/Uart.o
- .debug_frame   0x000002f4       0x90 build/armcpu.o
- .debug_frame   0x00000384       0xac build/stdio.o
- .debug_frame   0x00000430       0x30 build/stdlib.o
- .debug_frame   0x00000460       0x48 build/Kernel.o
- .debug_frame   0x000004a8       0xd4 build/task.o
- .debug_frame   0x0000057c       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+ .debug_frame   0x00000050      0x11c build/Main.o
+ .debug_frame   0x0000016c       0xb0 build/Interrupt.o
+ .debug_frame   0x0000021c       0x70 build/Timer.o
+ .debug_frame   0x0000028c       0x8c build/Uart.o
+ .debug_frame   0x00000318       0x90 build/armcpu.o
+ .debug_frame   0x000003a8       0xac build/stdio.o
+ .debug_frame   0x00000454       0x50 build/stdlib.o
+ .debug_frame   0x000004a4       0x90 build/event.o
+ .debug_frame   0x00000534      0x140 build/Kernel.o
+ .debug_frame   0x00000674       0xb0 build/msg.o
+ .debug_frame   0x00000724       0xd0 build/synch.o
+ .debug_frame   0x000007f4       0xf4 build/task.o
+ .debug_frame   0x000008e8       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a(_udivsi3.o)
+
+.debug_rnglists
+                0x00000000       0x17
+ .debug_rnglists
+                0x00000000       0x17 build/Kernel.o
